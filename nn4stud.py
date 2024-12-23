@@ -66,10 +66,12 @@ class DlNet:
         return 
         
     def backward(self, x, y):
+        pass
 #ToDo        
         
     def train(self, x_set, y_set, iters):    
         for i in range(0, iters):
+            pass
 #ToDo                
 
         
@@ -91,6 +93,6 @@ ax.xaxis.set_ticks_position('bottom')
 ax.yaxis.set_ticks_position('left')
 
 plt.plot(x,y, 'r')
-plt.plot(x,yh, 'b')
+# plt.plot(x,yh, 'b')
 
 plt.show()
