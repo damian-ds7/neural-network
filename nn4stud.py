@@ -14,7 +14,7 @@ Nie ma obowiązku używania tego kodu.
 import numpy as np
 
 #ToDo tu prosze podac pierwsze cyfry numerow indeksow
-p = [3,7]
+p = [1, 8]
 
 L_BOUND = -5
 U_BOUND = 5
