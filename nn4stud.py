@@ -51,7 +51,7 @@ class DlNet:
         self.y = y
         self.y_out = 0
         
-        self.HIDDEN_L_SIZE = 10
+        self.HIDDEN_L_SIZE = 14
         self.LR = 0.05
 
         self.W1 = np.random.randn(1, self.HIDDEN_L_SIZE) #weights between input and hidden layer
@@ -94,9 +94,11 @@ class DlNet:
         self.b1 -= self.LR * dLoss_db1    
         
     def train(self, x_set, y_set, iters):    
-        for i in range(0, iters):
+        for _ in range(0, iters):
             self.forward(x_set)
-            self.backward(x_set, y_set)            
+            loss_val = np.mean(nloss(self.y_out.flatten(), y_set))
+            self.backward(x_set, y_set)       
+        print('Iter: ', iters, 'Loss: ', loss_val)     
 
         
 nn = DlNet(x,y)
