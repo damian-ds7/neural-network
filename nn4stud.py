@@ -51,34 +51,61 @@ class DlNet:
         self.y = y
         self.y_out = 0
         
-        self.HIDDEN_L_SIZE = 9
-        self.LR = 0.003
-        
-#ToDo        
+        self.HIDDEN_L_SIZE = 20
+        self.LR = 0.05
+
+        self.W1 = np.random.randn(1, self.HIDDEN_L_SIZE) #weights between input and hidden layer
+        self.b1 = np.random.randn(1, self.HIDDEN_L_SIZE) #bias between input and hidden layer
+        self.W2 = np.random.randn(self.HIDDEN_L_SIZE, 1) #weights between hidden and output layer
+        self.b2 = np.random.randn(1, 1) #bias between hidden and output layer    
 
     
     def forward(self, x):  
-        pass
-#ToDo        
+        x_res = x.reshape(-1,1)
+        self.z1 = np.dot(x_res, self.W1) + self.b1
+        self.a1 = sigmoid(self.z1)
+        self.z2 = np.dot(self.a1, self.W2) + self.b2
+        self.y_out = self.z2
+        return self.y_out       
         
-    def predict(self, x):    
-        #ToDo        
-        return 
+    def predict(self, x):          
+        return self.forward(x)
         
     def backward(self, x, y):
-        pass
-#ToDo        
+        x_res = x.reshape(-1,1)
+        y_res = y.reshape(-1,1)
+        n = x_res.shape[0]
+
+        dLoss_dyOut = d_nloss(self.y_out, y_res)
+
+        dLoss_dz2 = dLoss_dyOut
+
+        dLoss_dW2 = np.dot(self.a1.T, dLoss_dz2) / n
+        dLoss_db2 = np.sum(dLoss_dz2, axis=0, keepdims=True) / n
+
+        dLoss_da1 = np.dot(dLoss_dz2, self.W2.T)
+        dLoss_dz1 = dLoss_da1 * d_sigmoid(self.z1)
+
+        dLoss_dW1 = np.dot(x_res.T, dLoss_dz1) / n
+        dLoss_db1 = np.sum(dLoss_dz1, axis=0, keepdims=True) / n
+        self.W2 -= self.LR * dLoss_dW2
+        self.b2 -= self.LR * dLoss_db2
+        self.W1 -= self.LR * dLoss_dW1
+        self.b1 -= self.LR * dLoss_db1    
         
     def train(self, x_set, y_set, iters):    
         for i in range(0, iters):
-            pass
-#ToDo                
+            self.forward(x_set)
+            self.backward(x_set, y_set)
+            if i % 1000 == 0:
+                print("Loss: ", np.mean(nloss(self.y_out, y_set)))               
 
         
 nn = DlNet(x,y)
-nn.train(x, y, 15000)
+nn.train(x, y, 100000)
 
-yh = [] #ToDo tu umiescić wyniki (y) z sieci
+
+yh = nn.predict(x).flatten()
 
 import matplotlib.pyplot as plt
 
@@ -93,6 +120,6 @@ ax.xaxis.set_ticks_position('bottom')
 ax.yaxis.set_ticks_position('left')
 
 plt.plot(x,y, 'r')
-# plt.plot(x,yh, 'b')
+plt.plot(x,yh, 'b')
 
 plt.show()
