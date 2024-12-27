@@ -140,19 +140,6 @@ if __name__ == "__main__":
 
     yh = nn.predict(x).flatten()
 
-<<<<<<< nn4stud.py
-fig = plt.figure()
-ax = fig.add_subplot(1, 1, 1)
-ax.spines["left"].set_position("center")
-ax.spines["bottom"].set_position("zero")
-ax.spines["right"].set_color("none")
-ax.spines["top"].set_color("none")
-ax.xaxis.set_ticks_position("bottom")
-ax.yaxis.set_ticks_position("left")
-
-plt.plot(x, y, "r")
-plt.plot(x, yh, "b")
-=======
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
     ax.spines["left"].set_position("center")
@@ -164,6 +151,5 @@ plt.plot(x, yh, "b")
 
     plt.plot(x, y, "r")
     plt.plot(x, yh, "b")
->>>>>>> nn4stud.py
 
     plt.savefig(Path(__file__).parent / "plot.png")
