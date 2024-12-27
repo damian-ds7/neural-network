@@ -58,6 +58,11 @@ def d_nloss(y_out, y):
     return 2 * (y_out - y)
 
 
+def xavier_uniform(shape_in, shape_out):
+    limit = np.sqrt(6.0 / (shape_in + shape_out))
+    return np.random.uniform(-limit, limit, (shape_in, shape_out))
+
+
 class DlNet:
     def __init__(self, layer_size, lr):
         self.y_out = 0
@@ -65,16 +70,10 @@ class DlNet:
         self.HIDDEN_L_SIZE = layer_size
         self.LR = lr
 
-        self.W1 = np.random.randn(
-            1, self.HIDDEN_L_SIZE
-        )  # weights between input and hidden layer
-        self.b1 = np.random.randn(
-            1, self.HIDDEN_L_SIZE
-        )  # bias between input and hidden layer
-        self.W2 = np.random.randn(
-            self.HIDDEN_L_SIZE, 1
-        )  # weights between hidden and output layer
-        self.b2 = np.random.randn(1, 1)  # bias between hidden and output layer
+        self.W1 = xavier_uniform(1, self.HIDDEN_L_SIZE)
+        self.b1 = np.zeros((1, self.HIDDEN_L_SIZE))
+        self.W2 = xavier_uniform(self.HIDDEN_L_SIZE, 1)
+        self.b2 = np.zeros((1, 1))
 
     def forward(self, x):
         x_res = x.reshape(-1, 1)
