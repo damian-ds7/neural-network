@@ -11,7 +11,7 @@ Kod nie jest wzorem dobrej jakości programowania w Pythonie, nie jest również
 Nie ma obowiązku używania tego kodu.
 """
 
-from dataclasses import asdict
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -22,6 +22,8 @@ p = [1, 8]
 
 L_BOUND = -5
 U_BOUND = 5
+
+np.seterr(all="raise")
 
 
 def q(x):
@@ -121,11 +123,11 @@ class DlNet:
 
 
 if __name__ == "__main__":
-    x = np.linspace(L_BOUND, U_BOUND, 100)
+    x = np.linspace(L_BOUND, U_BOUND, 200)
     y = q(x)
 
-    nn = DlNet(50, 0.005)
-    nn.train(x, y, 1000000)
+    nn = DlNet(13, 0.1)
+    nn.train(x, y, 1000)
 
     yh = nn.predict(x).flatten()
 
@@ -141,4 +143,4 @@ if __name__ == "__main__":
     plt.plot(x, y, "r")
     plt.plot(x, yh, "b")
 
-    plt.show()
+    plt.savefig(Path(__file__).parent / "plot.png")

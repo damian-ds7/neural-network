@@ -41,18 +41,15 @@ def generate_plot(
 
 def save_quality_file(
     ls_arr: vector,
-    test_loss_arr: vector,
-    res_loss_arr,
+    loss_arr: vector,
     iters: int,
     lr: float,
     path: Path,
 ):
     with open(path / f"quality_{iters}_iters_{lr}_lr.txt", "w") as file:
-        for layer_size, train_loss_val, test_loss_val in zip(
-            ls_arr, test_loss_arr, res_loss_arr
-        ):
+        for layer_size, loss_val in zip(ls_arr, loss_arr):
             file.write(
-                f"{layer_size}: training loss_val {format_float(train_loss_val)} - testing loss_val {format_float(test_loss_val)}\n"
+                f"{layer_size}: {format_float(loss_val)}\n"
             )
 
 
@@ -65,10 +62,8 @@ def create_train_network(
 
 
 def generate_data(
-    train_x: vector,
-    train_y: vector,
-    test_x: vector,
-    test_y: vector,
+    x: vector,
+    y: vector,
     layer_size_arr: vector,
     iters: int,
     lr: float,
@@ -77,50 +72,43 @@ def generate_data(
     save_dir.mkdir(parents=True, exist_ok=True)
 
     predicted_y_arr: vector[vector] = np.array(
-        [np.zeros_like(test_y) for _ in layer_size_arr]
+        [np.zeros_like(y) for _ in layer_size_arr]
     )
-    train_loss_arr: vector = np.zeros(layer_size_arr.size)
-    test_loss_arr: vector = np.zeros(layer_size_arr.size)
+    loss_arr: vector = np.zeros(layer_size_arr.size)
+
     with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
         futures = [
-            executor.submit(create_train_network, train_x, train_y, ls, iters, lr)
+            executor.submit(create_train_network, x, y, ls, iters, lr)
             for ls in layer_size_arr
         ]
 
         for i, future in enumerate(futures):
             nn, loss_val = future.result()
-            train_loss_arr[i] = loss_val
-            predicted_y_arr[i] = nn.predict(test_x).flatten()
-            test_loss_arr[i] = nn.calc_total_loss_val(test_y, predicted_y_arr[i])
+            loss_arr[i] = loss_val
+            predicted_y_arr[i] = nn.predict(x).flatten()
 
-    for predicted_y, layer_size in zip(
-        predicted_y_arr,
-        layer_size_arr,
-    ):
+    for predicted_y, layer_size in zip(predicted_y_arr, layer_size_arr):
         generate_plot(
             f"{layer_size}_ls_{iters}_iters_{lr}_lr",
-            test_x,
-            test_y,
+            x,
+            y,
             predicted_y,
             save_dir,
         )
 
     save_quality_file(
-        layer_size_arr, train_loss_arr, test_loss_arr, iters, lr, save_dir
+        layer_size_arr, loss_arr, iters, lr, save_dir
     )
 
 
 if __name__ == "__main__":
-    train_x: vector = np.linspace(L_BOUND + 1, U_BOUND - 1, 100)
-    train_y: vector = q(train_x)
+    x: vector = np.linspace(L_BOUND, U_BOUND, 100)
+    y: vector = q(x)
 
-    test_x: vector = np.linspace(L_BOUND, U_BOUND, 100)
-    test_y: vector = q(test_x)
-
-    iters_arr = [15000, 150000, 500000, 1000000]
-    lr_arr = [0.003, 0.004, 0.005, 0.006]
-    layer_size_arr: vector = np.array(list(range(5, 301, 5)))
+    iters_arr = [15000, 30000, 60000, 120000, 250000, 500000, 1000000]
+    lr_arr = [0.0001, 0.00001, 0.006]
+    layer_size_arr: vector = np.array(list(range(5, 100, 5)))
 
     for lr in lr_arr:
         for iters in iters_arr:
-            generate_data(train_x, train_y, test_x, test_y, layer_size_arr, iters, lr)
+            generate_data(x, y, layer_size_arr, iters, lr)
