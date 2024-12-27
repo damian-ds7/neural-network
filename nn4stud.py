@@ -5,12 +5,15 @@ Created on Mon Nov  8 16:51:50 2021
 
 @author: Rafał Biedrzycki
 Kodu tego mogą używać moi studenci na ćwiczeniach z przedmiotu Wstęp do Sztucznej Inteligencji.
-Kod ten powstał aby przyspieszyć i ułatwić pracę studentów, aby mogli skupić się na algorytmach sztucznej inteligencji. 
+Kod ten powstał aby przyspieszyć i ułatwić pracę studentów, aby mogli skupić się na algorytmach sztucznej inteligencji.
 Kod nie jest wzorem dobrej jakości programowania w Pythonie, nie jest również wzorem programowania obiektowego, może zawierać błędy.
 
 Nie ma obowiązku używania tego kodu.
 """
 
+from pathlib import Path
+
+import matplotlib.pyplot as plt
 import numpy as np
 
 # ToDo tu prosze podac pierwsze cyfry numerow indeksow
@@ -20,13 +23,12 @@ p = [1, 8]
 L_BOUND = -5
 U_BOUND = 5
 
+np.seterr(all="raise")
+
 
 def q(x):
     return np.sin(x * np.sqrt(p[0] + 1)) + np.cos(x * np.sqrt(p[1] + 1))
 
-
-x = np.linspace(L_BOUND, U_BOUND, 100)
-y = q(x)
 
 np.random.seed(1)
 
@@ -57,13 +59,11 @@ def d_nloss(y_out, y):
 
 
 class DlNet:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
+    def __init__(self, layer_size, lr):
         self.y_out = 0
 
-        self.HIDDEN_L_SIZE = 14
-        self.LR = 0.1
+        self.HIDDEN_L_SIZE = layer_size
+        self.LR = lr
 
         self.W1 = np.random.randn(
             1, self.HIDDEN_L_SIZE
@@ -123,19 +123,24 @@ class DlNet:
                 self.forward(x_batch)
                 self.backward(x_batch, y_batch)
             y_pred = self.forward(x_set)
-            loss_val = np.mean(nloss(y_pred.flatten(), y_set))
-            print(f"Epoch: {epoch+1}/{epochs}, Loss: {loss_val:.5f}")
+        loss_val = self.calc_total_loss_val(y_set, self.y_out)
+        return loss_val
+
+    @staticmethod
+    def calc_total_loss_val(y, pred_y):
+        return np.mean(nloss(pred_y.flatten(), y))
 
 
-nn = DlNet(x, y)
+if __name__ == "__main__":
+    x = np.linspace(L_BOUND, U_BOUND, 200)
+    y = q(x)
 
-nn.train(x, y, batch_size=20, epochs=1000)
+    nn = DlNet(13, 0.1)
+    nn.train(x, y, 1000)
 
-yh = nn.predict(x).flatten()
+    yh = nn.predict(x).flatten()
 
-import matplotlib.pyplot as plt
-
-
+<<<<<<< nn4stud.py
 fig = plt.figure()
 ax = fig.add_subplot(1, 1, 1)
 ax.spines["left"].set_position("center")
@@ -147,5 +152,18 @@ ax.yaxis.set_ticks_position("left")
 
 plt.plot(x, y, "r")
 plt.plot(x, yh, "b")
+=======
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
+    ax.spines["left"].set_position("center")
+    ax.spines["bottom"].set_position("zero")
+    ax.spines["right"].set_color("none")
+    ax.spines["top"].set_color("none")
+    ax.xaxis.set_ticks_position("bottom")
+    ax.yaxis.set_ticks_position("left")
 
-plt.show()
+    plt.plot(x, y, "r")
+    plt.plot(x, yh, "b")
+>>>>>>> nn4stud.py
+
+    plt.savefig(Path(__file__).parent / "plot.png")
