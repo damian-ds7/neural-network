@@ -132,11 +132,18 @@ class DlNet:
 
 
 if __name__ == "__main__":
-    x = np.linspace(L_BOUND, U_BOUND, 200)
+    x = np.linspace(L_BOUND, U_BOUND, 10000)
     y = q(x)
 
-    nn = DlNet(13, 0.1)
-    nn.train(x, y, 1000)
+    rng = np.random.default_rng()
+    train_indices = rng.choice(len(x), 5000, replace=False)
+    train_x = x[train_indices]
+    train_y = y[train_indices]
+
+    nn = DlNet(15, 0.1)
+    loss = nn.train(train_x, train_y, batch_size=100, epochs=5000)
+
+    print(loss)
 
     yh = nn.predict(x).flatten()
 
