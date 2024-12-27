@@ -72,8 +72,8 @@ class DlNet:
 
         self.W1 = distribution(1, self.HIDDEN_L_SIZE)
         self.b1 = distribution(1, self.HIDDEN_L_SIZE)
-        self.W2 = distribution(self.HIDDEN_L_SIZE, 1)
-        self.b2 = distribution(1, 1)
+        self.W2 = np.zeros((self.HIDDEN_L_SIZE, 1))
+        self.b2 = np.zeros((1, 1))
 
     def forward(self, x):
         x_res = x.reshape(-1, 1)
