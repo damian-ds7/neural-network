@@ -109,11 +109,20 @@ class DlNet:
         self.W1 -= self.LR * dLoss_dW1
         self.b1 -= self.LR * dLoss_db1
 
-    def train(self, x_set, y_set, iters):
-        for _ in range(0, iters):
-            self.forward(x_set)
-            self.backward(x_set, y_set)
-
+    def train(self, x_set, y_set, batch_size=16, epochs=20):
+        n_samples = len(x_set)
+        for epoch in range(epochs):
+            indices = np.arange(n_samples)
+            np.random.shuffle(indices)
+            x_shuffled = x_set[indices]
+            y_shuffled = y_set[indices]
+            for start_idx in range(0, n_samples, batch_size):
+                end_idx = start_idx + batch_size
+                x_batch = x_shuffled[start_idx:end_idx]
+                y_batch = y_shuffled[start_idx:end_idx]
+                self.forward(x_batch)
+                self.backward(x_batch, y_batch)
+            y_pred = self.forward(x_set)
         loss_val = self.calc_total_loss_val(y_set, self.y_out)
         return loss_val
 
@@ -131,6 +140,19 @@ if __name__ == "__main__":
 
     yh = nn.predict(x).flatten()
 
+<<<<<<< nn4stud.py
+fig = plt.figure()
+ax = fig.add_subplot(1, 1, 1)
+ax.spines["left"].set_position("center")
+ax.spines["bottom"].set_position("zero")
+ax.spines["right"].set_color("none")
+ax.spines["top"].set_color("none")
+ax.xaxis.set_ticks_position("bottom")
+ax.yaxis.set_ticks_position("left")
+
+plt.plot(x, y, "r")
+plt.plot(x, yh, "b")
+=======
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
     ax.spines["left"].set_position("center")
@@ -142,5 +164,6 @@ if __name__ == "__main__":
 
     plt.plot(x, y, "r")
     plt.plot(x, yh, "b")
+>>>>>>> nn4stud.py
 
     plt.savefig(Path(__file__).parent / "plot.png")
