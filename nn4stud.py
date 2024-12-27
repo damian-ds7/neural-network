@@ -23,8 +23,6 @@ p = [1, 8]
 L_BOUND = -5
 U_BOUND = 5
 
-np.seterr(all="raise")
-
 
 def q(x):
     return np.sin(x * np.sqrt(p[0] + 1)) + np.cos(x * np.sqrt(p[1] + 1))
@@ -35,13 +33,17 @@ np.random.seed(1)
 
 # f logistyczna jako przykład sigmoidalej
 def sigmoid(x):
-    return 1 / (1 + np.exp(-x))
+    x = np.exp(-x)
+    res = 1 / (1 + x)
+    return res
 
 
 # pochodna fun. 'sigmoid'
 def d_sigmoid(x):
-    s = 1 / (1 + np.exp(-x))
-    return s * (1 - s)
+    x = np.exp(-x)
+    s = 1 / (1 + x)
+    s = s * (1 - s)
+    return s
 
 
 FUNCTION = sigmoid
@@ -121,7 +123,7 @@ class DlNet:
                 y_batch = y_shuffled[start_idx:end_idx]
                 self.forward(x_batch)
                 self.backward(x_batch, y_batch)
-            y_pred = self.forward(x_set)
+        self.forward(x_set)
         loss_val = self.calc_total_loss_val(y_set, self.y_out)
         return loss_val
 
@@ -134,8 +136,12 @@ if __name__ == "__main__":
     x = np.linspace(L_BOUND, U_BOUND, 10000)
     y = q(x)
 
+    np.seterr(over="warn")
+    np.seterr(under="warn")
+    np.seterr(invalid="raise")
+
     rng = np.random.default_rng()
-    train_indices = rng.choice(len(x), 5000, replace=False)
+    train_indices = rng.choice(len(x), 2000, replace=False)
     train_x = x[train_indices]
     train_y = y[train_indices]
 
